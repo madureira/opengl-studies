@@ -6,7 +6,7 @@ int main(void)
 	int WINDOW_WIDTH = 640;
 	int WINDOW_HEIGHT = 480;
 
-	Window window("OpenGL Studies", WINDOW_WIDTH, WINDOW_HEIGHT);
+	Window window("OpenGL Studies", WINDOW_WIDTH, WINDOW_HEIGHT, true);
 	Shader shader("resources/shaders/basic.vsh", "resources/shaders/basic.fsh");
 
 	GLfloat points[] = {

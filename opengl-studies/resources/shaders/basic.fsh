@@ -1,7 +1,12 @@
-#version 410
+#version 400 core
 
-out vec4 frag_colour;
+in vec2 uv;
+in vec4 color;
 
-void main() {
-	frag_colour = vec4(0.5, 0.0, 0.5, 1.0);
+uniform sampler2D tex;
+
+void main(void)
+{
+	// texelFetch gets a pixel by its index in the texture instead of 0-1 spacing
+	gl_FragColor = texelFetch(tex, ivec2(uv), 0) * color;
 }

@@ -1,29 +1,20 @@
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <vector>
 #include <GL/glew.h>
-#include "../utils/fileutils.h"
+#include <GLFW/glfw3.h>
+#include <string>
 
 class Shader {
+
 private:
-	GLuint m_ShaderID;
-	const char* m_VertPath;
-	const char* m_FragPath;
+	GLuint m_shader;
+	GLenum m_type;
 
 public:
-	Shader(const char* vertexPath, const char* fragmentPath);
+	Shader();
 	~Shader();
 
-	inline GLuint getID() {
-		return m_ShaderID;
-	}
-
-	void enable() const;
-	void disable() const;
-
-private:
-	GLint getUniformLocation(const GLchar* name);
-	GLuint load();
+	bool InitFromFile(std::string filePath, GLenum shaderType);
+	bool InitFromString(std::string shaderCode, GLenum shaderType);
+	void AttachTo(GLuint program);
 };

@@ -21,6 +21,12 @@
     <ClCompile Include="src\graphics\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\spriteBatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\graphics\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,15 +35,26 @@
     <ClInclude Include="src\graphics\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\shader.h">
+    <ClInclude Include="src\utils\fileutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\fileutils.h">
+    <ClInclude Include="src\graphics\spriteBatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\shaders\basic.vsh" />
     <Text Include="resources\shaders\basic.fsh" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\images\texture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

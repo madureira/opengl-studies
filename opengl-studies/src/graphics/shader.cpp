@@ -1,96 +1,104 @@
-#include "shader.h"
+#pragma once
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
+#include "shader.h"
+#include <iostream>
+#include <fstream>
+
+Shader::Shader()
 {
-	this->m_VertPath = vertexPath;
-	this->m_FragPath = fragmentPath;
-	m_ShaderID = this->load();
 }
 
 Shader::~Shader()
 {
-	glDeleteProgram(m_ShaderID);
+	// Only delete the shader index if it was initialized successfully.
+	if (m_shader != 0)
+	{
+		glDeleteShader(m_shader);
+	}
 }
 
-void Shader::enable() const
+bool Shader::InitFromFile(std::string filePath, GLenum shaderType)
 {
-	glUseProgram(m_ShaderID);
+
+	std::ifstream file(filePath);
+
+	// Check if the file exists
+	if (!file.good())
+	{
+		// If we encounter an error, print a message and return false.
+		std::cout << "Can't read file: " << filePath << std::endl;
+		return false;
+	}
+
+	// ifstream internally keeps track of where in the file.
+
+	// Here we find the end of the file.
+	file.seekg(0, std::ios::end);
+
+	// Make a string and set its size equal to the length of the file.
+	std::string shaderCode;
+	shaderCode.resize((size_t)file.tellg());
+
+	// Go back to the beginning of the file.
+	file.seekg(0, std::ios::beg);
+
+	// Read the file into the string until we reach the end of the string.
+	file.read(&shaderCode[0], shaderCode.size());
+
+	// Close the file.
+	file.close();
+
+	// Init using the string.
+	return InitFromString(shaderCode, shaderType);
 }
 
-void Shader::disable() const
+bool Shader::InitFromString(std::string shaderCode, GLenum shaderType)
 {
-	glUseProgram(0);
+	m_type = shaderType;
+	m_shader = glCreateShader(shaderType);
+
+	// Get the char* and length
+	const char* shaderCodePointer = shaderCode.data();
+	int shaderCodeLength = shaderCode.size();
+
+	// Set the source code and compile.
+	glShaderSource(m_shader, 1, &shaderCodePointer, &shaderCodeLength);
+	glCompileShader(m_shader);
+
+	GLint isCompiled;
+
+	// Check if the fragmentShader compiles:
+	// If it failed, print an error and delete it.
+	glGetShaderiv(m_shader, GL_COMPILE_STATUS, &isCompiled);
+
+	if (!isCompiled)
+	{
+		char infolog[1024];
+		glGetShaderInfoLog(m_shader, 1024, NULL, infolog);
+		std::cout << "Shader compile failed with error: " << std::endl << infolog << std::endl;
+
+		// Delete the shader, and set the index to zero so that this object knows it doesn't have a shader.
+		glDeleteShader(m_shader);
+		m_shader = 0;
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
-GLint Shader::getUniformLocation(const GLchar* name)
+
+void Shader::AttachTo(GLuint program)
 {
-	return glGetUniformLocation(m_ShaderID, name);
-}
-
-GLuint Shader::load()
-{
-	GLuint program = glCreateProgram();
-	GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
-	GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
-
-	std::string vertSourceString = FileUtils::readFile(m_VertPath);
-	std::string fragSourceString = FileUtils::readFile(m_FragPath);
-
-	if (vertSourceString.empty())
+	// Attach the owned shader to the given shader program.
+	if (m_shader != 0)
 	{
-		std::cout << "Vertex shader is empty!" << std::endl;
-		return 0;
+		glAttachShader(program, m_shader);
 	}
-
-	if (fragSourceString.empty())
+	else
 	{
-		std::cout << "Fragment shader is empty!" << std::endl;
-		return 0;
+		// Print an error if trying to attach an uninitialized shader.
+		std::cout << "Failed to attach shader: Shader not initialized." << std::endl;
 	}
-
-	const char* vertSource = vertSourceString.c_str();
-	const char* fragSource = fragSourceString.c_str();
-
-	GLint result;
-
-	glShaderSource(vertex, 1, &vertSource, NULL);
-	glCompileShader(vertex);
-
-	glGetShaderiv(vertex, GL_COMPILE_STATUS, &result);
-	if (result == GL_FALSE)
-	{
-		GLint length;
-		glGetShaderiv(vertex, GL_INFO_LOG_LENGTH, &length);
-		std::vector<char> error(length);
-		glGetShaderInfoLog(vertex, length, &length, &error[0]);
-		std::cout << "Failed to compile vertex shader! " << &error[0] << std::endl;
-		glDeleteShader(vertex);
-		return 0;
-	}
-
-	glShaderSource(fragment, 1, &fragSource, NULL);
-	glCompileShader(fragment);
-
-	glGetShaderiv(fragment, GL_COMPILE_STATUS, &result);
-	if (result == GL_FALSE)
-	{
-		GLint length;
-		glGetShaderiv(fragment, GL_INFO_LOG_LENGTH, &length);
-		std::vector<char> error(length);
-		glGetShaderInfoLog(fragment, length, &length, &error[0]);
-		std::cout << "Failed to compile fragment shader!" << &error[0] << std::endl;
-		glDeleteShader(fragment);
-		return 0;
-	}
-
-	glAttachShader(program, vertex);
-	glAttachShader(program, fragment);
-
-	glLinkProgram(program);
-	glValidateProgram(program);
-
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
-
-	return program;
 }

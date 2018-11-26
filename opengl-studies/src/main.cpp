@@ -1,42 +1,42 @@
 #include "graphics/window.h"
-#include "graphics/shader.h"
+#include "graphics/spriteBatcher.h"
 
 int main(void)
 {
-	int WINDOW_WIDTH = 640;
-	int WINDOW_HEIGHT = 480;
+	int WINDOW_WIDTH = 1024;
+	int WINDOW_HEIGHT = 768;
 
 	Window window("OpenGL Studies", WINDOW_WIDTH, WINDOW_HEIGHT, true);
-	Shader shader("resources/shaders/basic.vsh", "resources/shaders/basic.fsh");
 
-	GLfloat points[] = {
-		 0.0f,  0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		-0.5f, -0.5f, 0.0f
-	};
-
-	GLuint vbo = 0;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-
-	GLuint vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	SpriteBatcher* spriteBatcher = new SpriteBatcher(glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+	Texture* texture = new Texture("resources/images/texture.png");
+	texture->IncRefCount();
 
 	while (window.isOpen())
 	{
 		window.clear();
 
-		shader.enable();
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		for (int i = 0; i < 10; i++)
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				for (int k = 0; k < 10; k++)
+				{
+					spriteBatcher->Draw(glm::vec4(100 + i * 50 + k * -10, 100 + j * 50 + k * -10, 50, 50), glm::vec4(0, 0, 300, 320), glm::vec4(i / 10.f, j / 10.f, k / 10.f, 1), texture);
+					// Uncomment this line to see how much slower it is to call draw separately for each sprite.
+					//spriteBatcher->Flush();
+				}
+			}
+		}
+		// Now that we have a collection of all the draws we want to make, send it all to the gpu to be drawn!
+		spriteBatcher->Flush();
 
 		window.update();
 	}
+
+	delete spriteBatcher;
+
+	texture->DecRefCount();
 
 	return 0;
 }

@@ -72,22 +72,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\Intermediate\</IntDir>
-    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(SolutionDir)dependencies\math\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\Intermediate\</IntDir>
-    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(SolutionDir)dependencies\math\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\Intermediate\</IntDir>
-    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(SolutionDir)dependencies\math\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\Intermediate\</IntDir>
-    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(SolutionDir)dependencies\math\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

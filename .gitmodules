@@ -1,0 +1,3 @@
+[submodule "dependencies/math"]
+	path = dependencies/math
+	url = git@github.com:madureira/math.git

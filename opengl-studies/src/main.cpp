@@ -51,10 +51,12 @@ int main(void)
 		1.0f, 0.0f, 0.0f, 0.0f, // first column
 		0.0f, 1.0f, 0.0f, 0.0f, // second column
 		0.0f, 0.0f, 1.0f, 0.0f, // third column
-		0.5f, 0.0f, 0.0f, 1.0f, // fourth column
+		0.0f, 0.0f, 0.0f, 1.0f, // fourth column
 	};
 	
 	int matrixLocation = glGetUniformLocation(shader.getID(), "matrix");
+	shader.enable();
+	glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
 
 	float speed = 1.0f; // move at 1 unit per second
 	float lastPosition = 0.0f;
@@ -77,13 +79,11 @@ int main(void)
 		lastPosition = matrix[12];
 
 		shader.enable();
-		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
-		window.clear();
+		//glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
 
-		
+		window.clear();
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-
 		window.update();
 	}
 

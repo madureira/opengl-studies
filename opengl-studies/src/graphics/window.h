@@ -15,7 +15,7 @@ public:
 	~Window();
 	bool isOpen();
 	void clear();
-	void update();
+	void render();
 
 private:
 	bool init();

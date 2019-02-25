@@ -31,7 +31,7 @@ void Window::clear()
 	glClearColor(0, 0, 0, 1);
 }
 
-void Window::update()
+void Window::render()
 {
 	glfwSwapBuffers(this->m_Window);
 	glfwPollEvents();

@@ -9,13 +9,13 @@ int main(void)
 	Window window("OpenGL Studies", WINDOW_WIDTH, WINDOW_HEIGHT, true);
 	Shader shader("resources/shaders/basic.vsh", "resources/shaders/basic.fsh");
 
-	GLfloat points[] = {
+	GLfloat points[3*3] = {
 		 0.0f,  0.5f, 0.0f,
 		 0.5f, -0.5f, 0.0f,
 		-0.5f, -0.5f, 0.0f
 	};
 
-	GLfloat colours[] = {
+	GLfloat colours[3*3] = {
 		1.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 1.0f
@@ -47,7 +47,8 @@ int main(void)
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
 
-	float matrix[] = {
+	// starts as an identity matrix
+	float matrix[4*4] = {
 		1.0f, 0.0f, 0.0f, 0.0f, // first column
 		0.0f, 1.0f, 0.0f, 0.0f, // second column
 		0.0f, 0.0f, 1.0f, 0.0f, // third column
@@ -79,12 +80,12 @@ int main(void)
 		lastPosition = matrix[12];
 
 		shader.enable();
-		//glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
+		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
 
 		window.clear();
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-		window.update();
+		window.render();
 	}
 
 	return 0;

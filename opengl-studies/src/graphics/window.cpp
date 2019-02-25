@@ -37,6 +37,11 @@ void Window::render()
 	glfwPollEvents();
 }
 
+GLFWwindow* Window::getGLFWwindow()
+{
+	return this->m_Window;
+}
+
 bool Window::init()
 {
 	if (!glfwInit())

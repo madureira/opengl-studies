@@ -1,5 +1,6 @@
 #include "graphics/window.h"
 #include "graphics/shader.h"
+#include "inputs/keyboard.h"
 
 int main(void)
 {
@@ -8,6 +9,7 @@ int main(void)
 
 	Window window("OpenGL Studies", WINDOW_WIDTH, WINDOW_HEIGHT, true);
 	Shader shader("resources/shaders/basic.vsh", "resources/shaders/basic.fsh");
+	Keyboard keyboard(&window);
 
 	GLfloat points[3*3] = {
 		 0.0f,  0.5f, 0.0f,
@@ -59,25 +61,40 @@ int main(void)
 	shader.enable();
 	glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
 
-	float speed = 1.0f; // move at 1 unit per second
-	float lastPosition = 0.0f;
+	float speed = 0.001f;
+	float lastX = 0.0f;
+	float lastY = 0.0f;
 
 	while (window.isOpen())
 	{
-		static double previousSeconds = glfwGetTime();
-		double currentSeconds = glfwGetTime();
-		double elapsedSeconds = currentSeconds - previousSeconds;
-		previousSeconds = currentSeconds;
+		keyboard.captureEvents();
 
-		// reverse direction when going to far left or right
-		if (fabs(lastPosition) > 1.0f)
+		if (keyboard.isUpKeyPressed())
 		{
-			speed = -speed;
+			lastY += speed;
+		}
+
+		if (keyboard.isDownKeyPressed())
+		{
+			lastY -= speed;
+		}
+
+		if (keyboard.isLeftKeyPressed())
+		{
+			lastX -= speed;
+		}
+
+		if (keyboard.isRightKeyPressed())
+		{
+			lastX += speed;
 		}
 
 		// update the matrix
-		matrix[12] = elapsedSeconds * speed + lastPosition;
-		lastPosition = matrix[12];
+		matrix[12] = lastX;
+		lastX = matrix[12];
+
+		matrix[13] = lastY;
+		lastY = matrix[13];
 
 		shader.enable();
 		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);

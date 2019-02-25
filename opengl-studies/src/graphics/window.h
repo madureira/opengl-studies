@@ -16,6 +16,7 @@ public:
 	bool isOpen();
 	void clear();
 	void render();
+	GLFWwindow* getGLFWwindow();
 
 private:
 	bool init();

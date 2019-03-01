@@ -1,6 +1,11 @@
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "graphics/window.h"
 #include "graphics/shader.h"
 #include "inputs/keyboard.h"
+
+#define ONE_DEG_IN_RAD (2.0 * 3.14159265358979323846) / 360.0 // 0.01744444
 
 int main(void)
 {
@@ -56,48 +61,109 @@ int main(void)
 		0.0f, 0.0f, 1.0f, 0.0f, // third column
 		0.0f, 0.0f, 0.0f, 1.0f, // fourth column
 	};
-	
-	int matrixLocation = glGetUniformLocation(shader.getID(), "matrix");
-	shader.enable();
-	glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
 
-	float speed = 0.001f;
-	float lastX = 0.0f;
-	float lastY = 0.0f;
+	float cam_speed = 1.0f; // 1 unit per second
+	float cam_yaw_speed = 1.0f; // 10 degrees per second
+	float cam_pos[3] = { 0.0f, 0.0f, 2.0f }; // don't start at zero, or we will be too close
+	float cam_yaw = 0.0f; // y-rotation in degrees
+
+	glm::mat4 T = glm::translate(glm::mat4(1.0), glm::vec3(-cam_pos[0], -cam_pos[1], -cam_pos[2]));
+	glm::mat4 R = glm::rotate(glm::mat4(1.0), -cam_yaw, glm::vec3(-1.0f, 0.0f, 0.0f));
+	glm::mat4 view_mat = R * T;
+
+	float near = 0.1f; // clipping plane
+	float far = 100.0f; // clipping plane
+	float fov = 67.0f * ONE_DEG_IN_RAD; // convert 67 degrees to radians
+	float aspect = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT; // aspect ratio
+
+	// matrix components
+	float range = tan(fov * 0.5f) * near;
+	float Sx = (2.0f * near) / (range * aspect + range * aspect);
+	float Sy = near / range;
+	float Sz = -(far + near) / (far - near);
+	float Pz = -(2.0f * far * near) / (far - near);
+
+	float proj_mat[4 * 4] = {
+		Sx,    0.0f,  0.0f,  0.0f,
+		0.0f,  Sy,    0.0f,  0.0f,
+		0.0f,  0.0f,  Sz,   -1.0f,
+		0.0f,  0.0f,  Pz,    0.0f
+	};
+
+	int view_mat_location = glGetUniformLocation(shader.getID(), "view");
+	shader.enable();
+	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, glm::value_ptr(view_mat));
+	int proj_mat_location = glGetUniformLocation(shader.getID(), "proj");
+	shader.enable();
+	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, proj_mat);
 
 	while (window.isOpen())
 	{
+		static double previousSeconds = glfwGetTime();
+		double currentSeconds = glfwGetTime();
+		double elapsed_seconds = currentSeconds - previousSeconds;
+		previousSeconds = currentSeconds;
+		bool cam_moved = false;
+
 		keyboard.captureEvents();
+
+		if (keyboard.isAKeyPressed())
+		{
+			cam_pos[0] -= cam_speed * elapsed_seconds;
+			cam_moved = true;
+		}
+
+		if (keyboard.isDKeyPressed())
+		{
+			cam_pos[0] += cam_speed * elapsed_seconds;
+			cam_moved = true;
+		}
 
 		if (keyboard.isUpKeyPressed())
 		{
-			lastY += speed;
+			cam_pos[1] += cam_speed * elapsed_seconds;
+			cam_moved = true;
 		}
 
 		if (keyboard.isDownKeyPressed())
 		{
-			lastY -= speed;
+			cam_pos[1] -= cam_speed * elapsed_seconds;
+			cam_moved = true;
+		}
+
+		if (keyboard.isWKeyPressed())
+		{
+			cam_pos[2] -= cam_speed * elapsed_seconds;
+			cam_moved = true;
+		}
+
+		if (keyboard.isSKeyPressed())
+		{
+			cam_pos[2] += cam_speed * elapsed_seconds;
+			cam_moved = true;
 		}
 
 		if (keyboard.isLeftKeyPressed())
 		{
-			lastX -= speed;
+			cam_yaw += cam_yaw_speed * elapsed_seconds;
+			cam_moved = true;
 		}
 
 		if (keyboard.isRightKeyPressed())
 		{
-			lastX += speed;
+			cam_yaw -= cam_yaw_speed * elapsed_seconds;
+			cam_moved = true;
 		}
 
-		// update the matrix
-		matrix[12] = lastX;
-		lastX = matrix[12];
-
-		matrix[13] = lastY;
-		lastY = matrix[13];
-
-		shader.enable();
-		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
+		// update view matrix
+		if (cam_moved)
+		{
+			glm::mat4 T = glm::translate(glm::mat4(1.0), glm::vec3(-cam_pos[0], -cam_pos[1], -cam_pos[2]));
+			glm::mat4 R = glm::rotate(glm::mat4(1.0), -cam_yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 view_mat = R * T;
+			shader.enable();
+			glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, glm::value_ptr(view_mat));
+		}
 
 		window.clear();
 		glBindVertexArray(VAO);

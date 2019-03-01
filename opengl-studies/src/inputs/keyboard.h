@@ -12,6 +12,10 @@ private:
 	bool m_Down;
 	bool m_Left;
 	bool m_Right;
+	bool m_W;
+	bool m_S;
+	bool m_A;
+	bool m_D;
 
 public:
 	Keyboard(Window* window);
@@ -21,6 +25,10 @@ public:
 	bool isDownKeyPressed();
 	bool isLeftKeyPressed();
 	bool isRightKeyPressed();
+	bool isWKeyPressed();
+	bool isSKeyPressed();
+	bool isAKeyPressed();
+	bool isDKeyPressed();
 
 private:
 	void resetState();

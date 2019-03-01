@@ -5,7 +5,7 @@ A template application to study opengl and shaders
 [![language](https://img.shields.io/badge/language-c++-blue.svg)](https://isocpp.org)
 [![c++](https://img.shields.io/badge/std-c++11-blue.svg)](https://isocpp.org/wiki/faq/cpp11)
 [![OpenGL](https://img.shields.io/badge/OpenGL-4.1.0-green.svg)](https://www.opengl.org/)
-[![GLEW](https://img.shields.io/badge/GLEW-7.0-green.svg)](http://glew.sourceforge.net/)
+[![GLEW](https://img.shields.io/badge/GLEW-2.1.0-green.svg)](http://glew.sourceforge.net/)
 [![GLFW](https://img.shields.io/badge/GLFW-3.2-orange.svg)](https://www.glfw.org/)
 [![msvc2017+](https://img.shields.io/badge/MSVC-2017+-ff69b4.svg)](https://visualstudio.microsoft.com/downloads)
 

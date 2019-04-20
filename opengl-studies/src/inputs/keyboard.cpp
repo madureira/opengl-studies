@@ -1,9 +1,16 @@
 #include "keyboard.h"
 
-Keyboard::Keyboard(Window* window)
+Keyboard::Keyboard(Window* window):
+	m_Window(window),
+	m_Up(false),
+	m_Down(false),
+	m_Left(false),
+	m_Right(false),
+	m_W(false),
+	m_S(false),
+	m_A(false),
+	m_D(false)
 {
-	this->m_Window = window;
-	this->resetState();
 }
 
 void Keyboard::captureEvents()

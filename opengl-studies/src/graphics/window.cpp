@@ -5,9 +5,11 @@ int g_gl_height;
 void window_resize(GLFWwindow *window, int width, int height);
 void error_callback(int error, const char* description);
 
-Window::Window(const char* title, int width, int height, bool vsync)
+Window::Window(const char* title, int width, int height, bool vsync):
+	m_Title(title),
+	m_VSync(vsync),
+	m_Window(nullptr)
 {
-	this->m_Title = title;
 	g_gl_width = width;
 	g_gl_height = height;
 	this->init();
@@ -89,7 +91,8 @@ void Window::updateFpsCounter()
 	static int frame_count;
 	double current_seconds = glfwGetTime();
 	double elapsed_seconds = current_seconds - previous_seconds;
-	if (elapsed_seconds > 0.25) {
+	if (elapsed_seconds > 0.25)
+	{
 		previous_seconds = current_seconds;
 		double fps = (double)frame_count / elapsed_seconds;
 		char tmp[128];

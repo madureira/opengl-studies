@@ -1,9 +1,9 @@
 #include "shader.h"
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
+Shader::Shader(const char* vertexPath, const char* fragmentPath):
+	m_VertPath(vertexPath),
+	m_FragPath(fragmentPath)
 {
-	this->m_VertPath = vertexPath;
-	this->m_FragPath = fragmentPath;
 	m_ShaderID = this->load();
 }
 

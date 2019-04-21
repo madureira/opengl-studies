@@ -4,17 +4,19 @@
 #include "graphics/window.h"
 #include "graphics/shader.h"
 #include "inputs/keyboard.h"
+#include "inputs/mouse.h"
 
 constexpr auto ONE_DEG_IN_RAD = (2.0 * 3.14159265358979323846) / 360.0; // 0.01744444;
 constexpr int WINDOW_WIDTH = 640;
 constexpr int WINDOW_HEIGHT = 480;
-constexpr bool V_SYNC = true;
+constexpr bool V_SYNC = false;
 
 int main()
 {
 	Window window("OpenGL Studies", WINDOW_WIDTH, WINDOW_HEIGHT, V_SYNC);
 	Shader shader("resources/shaders/basic.vsh", "resources/shaders/basic.fsh");
 	Keyboard keyboard(&window);
+	Mouse mouse(&window);
 
 	GLfloat points[3*3] = {
 		 0.0f,  0.5f, 0.0f,
@@ -98,6 +100,11 @@ int main()
 	shader.enable();
 	glUniformMatrix4fv(projMatLocation, 1, GL_FALSE, projMat);
 
+	double cursorXPos, cursorYPos;
+
+	bool wasLeftButtonPressed = false;
+	bool wasRightButtonPressed = false;
+
 	while (window.isOpen())
 	{
 		static double previousSeconds = glfwGetTime();
@@ -106,7 +113,32 @@ int main()
 		previousSeconds = currentSeconds;
 		bool isCamMoved = false;
 
-		keyboard.captureEvents();
+		mouse.getCursorPosition(&cursorXPos, &cursorYPos);
+		bool isLeftButtonPressed = mouse.isLeftButtonPressed();
+		bool isRightButtonPressed = mouse.isRightButtonPressed();
+
+		if (isLeftButtonPressed)
+		{
+			std::cout << "< [LEFT  PRESSED]   " << '\r' << std::flush;
+		}
+		else if (isRightButtonPressed)
+		{
+			std::cout << "  [RIGHT PRESSED] > " << '\r' << std::flush;
+		}
+		else if (!isLeftButtonPressed && wasLeftButtonPressed)
+		{
+			std::cout << "< [LEFT  CLICK]   " << '\r' << std::flush;
+		}
+		else if (!isRightButtonPressed && wasRightButtonPressed)
+		{
+			std::cout << "  [RIGHT CLICK] > " << '\r' << std::flush;
+		}
+		else {
+			std::cout << "x: " << cursorXPos << ", y: " << cursorYPos << "       " << '\r' << std::flush;
+		}
+
+		wasLeftButtonPressed = isLeftButtonPressed;
+		wasRightButtonPressed = isRightButtonPressed;
 
 		if (keyboard.isAKeyPressed())
 		{

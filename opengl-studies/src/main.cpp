@@ -5,11 +5,12 @@
 #include "graphics/shader.h"
 #include "inputs/keyboard.h"
 #include "inputs/mouse.h"
+#include "graphics/text_renderer.h"
 
 constexpr auto ONE_DEG_IN_RAD = (2.0 * 3.14159265358979323846) / 360.0; // 0.01744444;
-constexpr int WINDOW_WIDTH = 640;
-constexpr int WINDOW_HEIGHT = 480;
-constexpr bool V_SYNC = false;
+constexpr int WINDOW_WIDTH = 1280;
+constexpr int WINDOW_HEIGHT = 720;
+constexpr bool V_SYNC = true;
 
 int main()
 {
@@ -17,6 +18,7 @@ int main()
 	Shader shader("resources/shaders/basic.vsh", "resources/shaders/basic.fsh");
 	Keyboard keyboard(&window);
 	Mouse mouse(&window);
+	TextRenderer textRenderer("resources/fonts/roboto-regular.ttf", WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	GLfloat points[3*3] = {
 		 0.0f,  0.5f, 0.0f,
@@ -51,10 +53,6 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, coloursVBO);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(1);
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CW);
 
 	// starts as an identity matrix
 	float matrix[4*4] = {
@@ -92,14 +90,12 @@ int main()
 		0.0f,  0.0f,  Pz,    0.0f
 	};
 
+	shader.enable();
 	int viewMatLocation = glGetUniformLocation(shader.getID(), "view");
-	shader.enable();
 	glUniformMatrix4fv(viewMatLocation, 1, GL_FALSE, glm::value_ptr(viewMat));
-
 	int projMatLocation = glGetUniformLocation(shader.getID(), "proj");
-	shader.enable();
 	glUniformMatrix4fv(projMatLocation, 1, GL_FALSE, projMat);
-
+	shader.disable();
 	double cursorXPos, cursorYPos;
 
 	bool wasLeftButtonPressed = false;
@@ -113,28 +109,31 @@ int main()
 		previousSeconds = currentSeconds;
 		bool isCamMoved = false;
 
+		double xOffSet = 0;
+		double yOffSet = 0;
+
 		mouse.getCursorPosition(&cursorXPos, &cursorYPos);
+		mouse.getScrollOffSet(&xOffSet, &yOffSet);
+
 		bool isLeftButtonPressed = mouse.isLeftButtonPressed();
 		bool isRightButtonPressed = mouse.isRightButtonPressed();
 
+		std::string mouseEvent = "";
 		if (isLeftButtonPressed)
 		{
-			std::cout << "< [LEFT  PRESSED]   " << '\r' << std::flush;
+			mouseEvent = "[LEFT  PRESSED]";
 		}
 		else if (isRightButtonPressed)
 		{
-			std::cout << "  [RIGHT PRESSED] > " << '\r' << std::flush;
+			mouseEvent = "[RIGHT PRESSED]";
 		}
 		else if (!isLeftButtonPressed && wasLeftButtonPressed)
 		{
-			std::cout << "< [LEFT  CLICK]   " << '\r' << std::flush;
+			mouseEvent = "[LEFT  CLICK]";
 		}
 		else if (!isRightButtonPressed && wasRightButtonPressed)
 		{
-			std::cout << "  [RIGHT CLICK] > " << '\r' << std::flush;
-		}
-		else {
-			std::cout << "x: " << cursorXPos << ", y: " << cursorYPos << "       " << '\r' << std::flush;
+			mouseEvent = "[RIGHT CLICK]";
 		}
 
 		wasLeftButtonPressed = isLeftButtonPressed;
@@ -188,19 +187,29 @@ int main()
 			isCamMoved = true;
 		}
 
-		// update view matrix
+		shader.enable();
 		if (isCamMoved)
 		{
 			glm::mat4 T = glm::translate(glm::mat4(1.0), glm::vec3(-camPos[0], -camPos[1], -camPos[2]));
 			glm::mat4 R = glm::rotate(glm::mat4(1.0), -camYaw, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 view_mat = R * T;
-			shader.enable();
 			glUniformMatrix4fv(viewMatLocation, 1, GL_FALSE, glm::value_ptr(view_mat));
 		}
+
+		int fps = window.getFpsCounter();
 
 		window.clear();
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(0);
+		shader.disable();
+
+		textRenderer.renderText("FPS: " + std::to_string(fps), 2.0f, 700.0f, 0.4f, glm::vec3(0.5, 0.8f, 0.2f));
+		textRenderer.renderText("x: " + std::to_string((int)cursorXPos), 2.0f, 675.0f, 0.4f, glm::vec3(0, 0, 255));
+		textRenderer.renderText("y: " + std::to_string((int)cursorYPos), 2.0f, 650.0f, 0.4f, glm::vec3(0, 0, 255));
+		textRenderer.renderText("Mouse event: " + mouseEvent, 2.0f, 620.0f, 0.4f, glm::vec3(255, 0, 0));
+		textRenderer.renderText("Mouse scroll: " + std::to_string((int) yOffSet), 2.0f, 595.0f, 0.4f, glm::vec3(255, 0, 0));
+
 		window.render();
 	}
 

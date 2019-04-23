@@ -27,10 +27,9 @@ bool Window::isOpen()
 
 void Window::clear()
 {
-	this->updateFpsCounter();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glViewport(0, 0, g_gl_width, g_gl_height);
-	glClearColor(0, 0, 0, 1);
 }
 
 void Window::render()
@@ -42,6 +41,29 @@ void Window::render()
 GLFWwindow* Window::getGLFWwindow()
 {
 	return this->m_Window;
+}
+
+int Window::getFpsCounter()
+{
+	static double previous_seconds = glfwGetTime();
+	static int frame_count;
+	double current_seconds = glfwGetTime();
+	double elapsed_seconds = current_seconds - previous_seconds;
+	static double fps = 0;
+
+	if (elapsed_seconds > 0.25)
+	{
+		previous_seconds = current_seconds;
+		fps = (double)frame_count / elapsed_seconds;
+		//char tmp[128];
+		//sprintf_s(tmp, "%s - opengl @ fps: %.2f", this->m_Title, fps);
+		//glfwSetWindowTitle(this->m_Window, tmp);
+		frame_count = 0;
+	}
+
+	frame_count++;
+
+	return fps;
 }
 
 bool Window::init()
@@ -71,9 +93,13 @@ bool Window::init()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4); // Anti-Alising
+
 	glfwSwapInterval(m_VSync ? 1 : 0);
 
 	glfwSetErrorCallback(error_callback);
+
+	// Initialize GLEW to setup the OpenGL Function pointers
+	glewExperimental = GL_TRUE;
 
 	if (glewInit() != GLEW_OK)
 	{
@@ -81,26 +107,15 @@ bool Window::init()
 		return false;
 	}
 
-	std::cout << "OpenGL " << glGetString(GL_VERSION) << std::endl;
-	return true;
-}
+	// Set OpenGL options
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_FRONT_FACE);
+	glFrontFace(GL_CW);
 
-void Window::updateFpsCounter()
-{
-	static double previous_seconds = glfwGetTime();
-	static int frame_count;
-	double current_seconds = glfwGetTime();
-	double elapsed_seconds = current_seconds - previous_seconds;
-	if (elapsed_seconds > 0.25)
-	{
-		previous_seconds = current_seconds;
-		double fps = (double)frame_count / elapsed_seconds;
-		char tmp[128];
-		sprintf_s(tmp, "%s - opengl @ fps: %.2f", this->m_Title, fps);
-		glfwSetWindowTitle(this->m_Window, tmp);
-		frame_count = 0;
-	}
-	frame_count++;
+	std::cout << "OpenGL " << glGetString(GL_VERSION) << std::endl;
+
+	return true;
 }
 
 void window_resize(GLFWwindow *window, int width, int height)

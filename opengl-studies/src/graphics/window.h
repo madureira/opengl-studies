@@ -17,8 +17,8 @@ public:
 	void clear();
 	void render();
 	GLFWwindow* getGLFWwindow();
+	int getFpsCounter();
 
 private:
 	bool init();
-	void updateFpsCounter();
 };

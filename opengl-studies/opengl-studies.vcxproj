@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\Intermediate\</IntDir>
-    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(SolutionDir)dependencies\glm\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLEW\include;$(SolutionDir)dependencies\glm\include;$(SolutionDir)dependencies\freetype\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)\</OutDir>
@@ -100,8 +100,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\GLFW\Win32;$(SolutionDir)dependencies\GLEW\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\GLFW\Win32;$(SolutionDir)dependencies\GLEW\Win32;$(SolutionDir)dependencies\freetype\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
@@ -179,6 +179,7 @@ xcopy /y /d /s "$(SolutionDir)$(ProjectName)\resources" "$(SolutionDir)bin\$(Pla
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\graphics\shader.cpp" />
+    <ClCompile Include="src\graphics\text_renderer.cpp" />
     <ClCompile Include="src\inputs\keyboard.cpp" />
     <ClCompile Include="src\inputs\mouse.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -186,6 +187,7 @@ xcopy /y /d /s "$(SolutionDir)$(ProjectName)\resources" "$(SolutionDir)bin\$(Pla
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\shader.h" />
+    <ClInclude Include="src\graphics\text_renderer.h" />
     <ClInclude Include="src\graphics\window.h" />
     <ClInclude Include="src\inputs\keyboard.h" />
     <ClInclude Include="src\inputs\mouse.h" />
@@ -198,6 +200,19 @@ xcopy /y /d /s "$(SolutionDir)$(ProjectName)\resources" "$(SolutionDir)bin\$(Pla
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\shaders\basic.fsh">
+      <FileType>Document</FileType>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\roboto-regular.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\shaders\text.vsh">
+      <FileType>Document</FileType>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\shaders\text.fsh">
       <FileType>Document</FileType>
     </Text>
   </ItemGroup>
